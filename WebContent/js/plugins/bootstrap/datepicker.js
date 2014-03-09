@@ -483,7 +483,7 @@
 		setDates: function(){
 			var args = $.isArray(arguments[0]) ? arguments[0] : arguments;
 			this.update.apply(this, args);
-			console.log("set dates : " + args);
+			console.log("setDates : " + args[0]);
 			this._trigger('changeDate');
 			this.setValue();
 		},

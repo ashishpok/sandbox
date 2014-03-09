@@ -34,14 +34,15 @@
 		</div>
 		
 		<div class="col-lg-6">
+			<div class="btn-group pull-right" id="db-rangepicker">
+			  <button type="button" class="btn btn-default" data-value="7">7 days</button>
+			  <button type="button" class="btn btn-default" data-value="30">30 days</button>
+			  <button type="button" class="btn btn-default"data-value="90">90 days</button>
+			</div>
 			<div class="input-group date" id="db-datepicker">
 			  <input type="text" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
 			</div>
-			<div class="btn-group">
-			  <button type="button" class="btn btn-default">Left</button>
-			  <button type="button" class="btn btn-default">Middle</button>
-			  <button type="button" class="btn btn-default">Right</button>
-			</div>
+			
 		</div>
 		
 		<div class="col-lg-3">
@@ -471,6 +472,8 @@
 	<!-- Core Scripts - Include with every page -->
 	<script src="js/jquery-1.10.2.js"></script>
 	<script src="js/bootstrap.js"></script>
+	<script src="js/moment.min.js"></script>
+	
 
 	<!-- Page-Level Plugin Scripts - Tables -->
 	<script src="js/plugins/dataTables/jquery.dataTables.js"></script>
@@ -483,21 +486,41 @@
     $(document).ready(function() {
     	
     	//PAGE FILTER
-    	//$('#db-datepicker input').attr('value', '03/08/2013').addClass("disabled");
     	var dbDatepicker = $('#db-datepicker').datepicker({
-    	    endDate: 'Date()',
+    	    endDate: '-1d',
     	    format: 'mm/dd/yyyy',
     	    todayBtn: true,
     	    orientation: "top auto",
     	    autoclose: true,
     	    todayHighlight: true
     	});
-    	$('#db-datepicker').datepicker('setDate', '03/08/2013');
-    	//$('#db-datepicker input').attr('value', '03/08/2013').addClass("disabled");
+    	$(dbDatepicker).find('input').prop('disabled', true);
+    	$(dbDatepicker).datepicker('setDate', moment().subtract("days",1 ).format("MM/DD/YYYY"));
+    	var currentVal = moment($(dbDatepicker).datepicker('getDate')).format("MM/DD/YYYY");
     	
-    	$('#db-datepicker').datepicker().on('changeDate', function(e){
-            console.log("date changed : " + e.type + ", " + e.date + ", " + e.dates);
+    	$(dbDatepicker).datepicker().on('changeDate', function(event){
+            console.log("date changed from " + currentVal + " to " + moment(event.date).format("MM/DD/YYYY"));
+            if (event.date == null) {
+            	$(dbDatepicker).datepicker('setDate', currentVal);
+            	console.log("handle null");
+            } else if (moment(event.date).format("MM/DD/YYYY") == currentVal) {
+            	console.log("nothing to do");
+            } else {
+            	console.log("HANDLE THIS EVENT");
+            	currentVal = moment(event.date).format("MM/DD/YYYY");
+            	$("#db-rangepicker button").removeClass('active')
+            }
+        	$(dbDatepicker).find('input').removeClass('white-background');
+        	$(dbDatepicker).find('span').removeClass('white-background');
         });
+    	
+    	// DATERANGE PICKER
+    	$("#db-rangepicker button").click(function(e) {
+    		console.log("button clicked : " + $(this).attr('data-value'));
+    		$(this).addClass('active').siblings().removeClass('active');
+    		$(dbDatepicker).find('input').addClass('white-background');
+        	$(dbDatepicker).find('span').addClass('white-background');
+    	});
     	
     	//DATATABLE CODE
         var exampleTable = $('#dataTables-example').dataTable().fnSetFilteringDelay(350);
