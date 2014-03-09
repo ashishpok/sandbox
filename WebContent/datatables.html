@@ -496,27 +496,35 @@
     	$(dbDatepicker).find('input').prop('disabled', true);
     	$(dbDatepicker).datepicker('setDate', moment().subtract("days",1 ).format("MM/DD/YYYY"));
     	var currentVal = moment($(dbDatepicker).datepicker('getDate')).format("MM/DD/YYYY");
+    	var fromPicker = false;
     	
     	$(dbDatepicker).datepicker().on('changeDate', function(event){
             console.log("date changed from " + currentVal + " to " + moment(event.date).format("MM/DD/YYYY"));
             if (event.date == null) {
             	$(dbDatepicker).datepicker('setDate', currentVal);
-            	console.log("handle null");
+            	if (fromPicker) {
+            		fromPicker = false;
+            		console.log("HANDLE THIS EVENT TOO");
+            	} else {
+            		console.log("handle null");
+            	}
             } else if (moment(event.date).format("MM/DD/YYYY") == currentVal) {
             	console.log("nothing to do");
             } else {
             	console.log("HANDLE THIS EVENT");
             	currentVal = moment(event.date).format("MM/DD/YYYY");
-            	$("#db-rangepicker button").removeClass('active')
             }
         	$(dbDatepicker).find('input').removeClass('white-background');
         	$(dbDatepicker).find('span').removeClass('white-background');
+        	$("#db-rangepicker button").removeClass('active')
         });
     	
     	// DATERANGE PICKER
     	$("#db-rangepicker button").click(function(e) {
     		console.log("button clicked : " + $(this).attr('data-value'));
+    		fromPicker = true;
     		$(this).addClass('active').siblings().removeClass('active');
+    		//handle date range picker
     		$(dbDatepicker).find('input').addClass('white-background');
         	$(dbDatepicker).find('span').addClass('white-background');
     	});
